@@ -4,6 +4,7 @@
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 
+using namespace std;
 using namespace llvm;
 
 namespace {
@@ -23,7 +24,9 @@ namespace {
     // The LLVM IR of the input functions is ready and it can be analyzed and/or transformed
     bool runOnFunction (Function &F) override {
       // errs() << "Hello LLVM World at \"runOnFunction\"\n" ;
-      std::cerr << F->getName();
+      errs() << "Function \"";
+      errs().write_escaped(F.getName()) << "\"\n";
+      F.print(errs());
       return false;
     }
 
