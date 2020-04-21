@@ -26,26 +26,21 @@ namespace {
     bool runOnFunction (Function &F) override {
       DominatorTree &DT = getAnalysis<DominatorTreeWrapperPass>().getDomTree();
       std::map<std::string, int> counters;
-      
+
       for (auto& B : F) {
-        auto inst = B.begin();
-        auto instNode = DT.getNode(&B);
+        if (DT.dominates(&*B.begin(), &B)) continue;
 
-        for (auto child : instNode->getChildren()) {
-          auto dominatedBB = child->getBlock();
-          for (auto& I : *dominatedBB) {
-            if (isa<CallInst>(&I)) {
-              CallInst *callInst = &cast<CallInst>(&I);
-              Function *callee = callInst->getCalledFunction();
+        for (auto& I : B) {
+          if (isa<CallInst>(&I)) {
+            CallInst *callInst = cast<CallInst>(&I);
+            Function *callee = callInst->getCalledFunction();
 
-              std::string funcName = callee->getName();
-              if (funcName.substr(0, 3) == "CAT") {
-                if (counters.count(funcName) == 0) {
-                  counters[funcName] = 0;
-                }
-
-                counters[funcName] = counters[funcName] + 1;
+            std::string funcName = callee->getName();
+            if (funcName.substr(0, 3) == "CAT") {
+              if (counters.count(funcName) == 0) {
+                counters[funcName] = 0;
               }
+              counters[funcName] = counters[funcName] + 1;
             }
           }
         }
