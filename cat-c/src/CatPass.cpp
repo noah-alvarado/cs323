@@ -1,4 +1,5 @@
 #include "llvm/Pass.h"
+#include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/Support/raw_ostream.h"
@@ -23,20 +24,28 @@ namespace {
     // This function is invoked once per function compiled
     // The LLVM IR of the input functions is ready and it can be analyzed and/or transformed
     bool runOnFunction (Function &F) override {
+      DominatorTree &DT = getAnalysis<DominatorTreeWrapperPass>().getDomTree();
       std::map<std::string, int> counters;
+      
       for (auto& B : F) {
-        for (auto& I : B) {
-          if (isa<CallInst>(&I)) {
-            CallInst *callInst = cast<CallInst>(&I);
-            Function *callee = callInst->getCalledFunction();
+        auto inst = B.begin();
+        auto instNode = DT.getNode(&B);
 
-            std::string funcName = callee->getName();
-            if (funcName.substr(0, 3) == "CAT") {
-              if (counters.count(funcName) == 0) {
-                counters[funcName] = 0;
+        for (auto child : instNode->getChildren()) {
+          auto dominatedBB = child->getBlock();
+          for (auto& I : *dominatedBB) {
+            if (isa<CallInst>(&I)) {
+              CallInst *callInst = &cast<CallInst>(&I);
+              Function *callee = callInst->getCalledFunction();
+
+              std::string funcName = callee->getName();
+              if (funcName.substr(0, 3) == "CAT") {
+                if (counters.count(funcName) == 0) {
+                  counters[funcName] = 0;
+                }
+
+                counters[funcName] = counters[funcName] + 1;
               }
-
-              counters[funcName] = counters[funcName] + 1;
             }
           }
         }
@@ -54,6 +63,7 @@ namespace {
     // We don't modify the program, so we preserve all analyses.
     // The LLVM IR of functions isn't ready at this point
     void getAnalysisUsage(AnalysisUsage &AU) const override {
+      AU.addRequired<DominatorTreeWrapperPass>();
       AU.setPreservesAll();
     }
   };
