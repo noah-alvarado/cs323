@@ -112,14 +112,12 @@ namespace {
 
                 for (auto user : result->users()) {
                   CallInst *ci = cast<CallInst>(user);
-                  ci->print(errs());
-                  errs() << "\n";
                   if (isa<CallInst>(user)) {
                     CallInst *ci = cast<CallInst>(user);
-                    switch (funcToCatCode(ci->getName())) {
+                    std::string fn = funcToCatCode(ci->getCalledFunction()->getName());
+                    switch (fn) {
                       case cat_add:
-                        ci->print(errs());
-                        errs() << "\n";
+                        errs() << *ci << "\n";
                         break;
                       case cat_sub:
                         errs() << *ci << "\n";
