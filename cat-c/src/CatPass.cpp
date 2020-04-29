@@ -111,19 +111,17 @@ namespace {
                 if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
 
                 for (auto user : result->users()) {
-                  CallInst *ci = cast<CallInst>(user);
                   if (isa<CallInst>(user)) {
                     CallInst *ci = cast<CallInst>(user);
-                    Function *func = ci->getCalledFunction();
-                    switch (funcToCatCode(func->getName())) {
+                    switch (funcToCatCode(ci->getCalledFunction()->getName())) {
                       case cat_add:
-                        errs() << *ci << "\n";
+                        kill_sets[&I].insert(ci);
                         break;
                       case cat_sub:
-                        errs() << *ci << "\n";
+                        kill_sets[&I].insert(ci);
                         break;
                       case cat_set:
-                        errs() << *ci << "\n";
+                        kill_sets[&I].insert(ci);
                         break;
                     }
                   }
