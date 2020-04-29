@@ -114,8 +114,8 @@ namespace {
                   CallInst *ci = cast<CallInst>(user);
                   if (isa<CallInst>(user)) {
                     CallInst *ci = cast<CallInst>(user);
-                    std::string fn = funcToCatCode(ci->getCalledFunction()->getName());
-                    switch (fn) {
+                    Function *func = ci->getCalledFunction();
+                    switch (funcToCatCode(func->getName())) {
                       case cat_add:
                         errs() << *ci << "\n";
                         break;
