@@ -34,7 +34,7 @@ namespace {
       return none;
     };
 
-    void printH2 (Function F, std::map<Instruction *, std::set<Instruction *>> gen_sets, std::map<Instruction *, std::set<Instruction *>> kill_sets) {
+    void printH2 (Function &F, std::map<Instruction *, std::set<Instruction *>> &gen_sets, std::map<Instruction *, std::set<Instruction *>> &kill_sets) {
       errs() << "Function \"";
       errs().write_escaped(F.getName()) << "\"\n";
     }
