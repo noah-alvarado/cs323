@@ -37,7 +37,7 @@ namespace {
 
     void printH2 (Function &F, std::map<Instruction *, std::set<Instruction *>> &gen_sets, std::map<Instruction *, std::set<Instruction *>> &kill_sets) {
       errs() << "Function \"";
-      errs().write_escaped(F.getName()) << "\"\n";
+      errs().write_escaped(F.getName()) << "\" \n";
 
       for (auto& B : F) {
         for (auto& I : B) {
@@ -108,6 +108,11 @@ namespace {
 
                 Value* result = callInst->getArgOperand(0);
                 if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
+
+                for (auto iter = result->use_begin()) {}
+
+                // remove self from kill set
+                // if (kill_sets[&I].find(&I) != kill_sets[&I].end()) kill_sets[&I].erase(kill_sets[&I].find(&I));
 
                 break;
               }
