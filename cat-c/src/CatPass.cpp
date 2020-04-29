@@ -50,6 +50,7 @@ namespace {
           errs() << "***************** GEN" << "\n";
           errs() << "{" << "\n";
           for (auto i : gen_sets[&I]) {
+            errs() << " ";
             i->print(errs());
             errs() << "\n";
           }
@@ -60,6 +61,7 @@ namespace {
           errs() << "***************** KILL" << "\n";
           errs() << "{" << "\n";
           for (auto i : kill_sets[&I]) {
+            errs() << " ";
             i->print(errs());
             errs() << "\n";
           }
