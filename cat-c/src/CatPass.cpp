@@ -43,14 +43,13 @@ namespace {
         for (auto& I : B) {
           if (gen_sets.find(&I) == gen_sets.end()) continue;
 
-          errs() << "INSTRUCTION:   ";
+          errs() << "INSTRUCTION: ";
           I.print(errs());
           errs() << "\n";
 
           errs() << "***************** GEN" << "\n";
           errs() << "{" << "\n";
           for (auto i : gen_sets[&I]) {
-            errs() << "   ";
             i->print(errs());
             errs() << "\n";
           }
@@ -61,7 +60,6 @@ namespace {
           errs() << "***************** KILL" << "\n";
           errs() << "{" << "\n";
           for (auto i : kill_sets[&I]) {
-            errs() << "   ";
             i->print(errs());
             errs() << "\n";
           }
