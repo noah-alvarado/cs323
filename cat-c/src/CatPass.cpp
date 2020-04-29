@@ -2,6 +2,7 @@
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/User.h"
 #include "llvm/IR/Value.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/LegacyPassManager.h"
@@ -110,9 +111,9 @@ namespace {
                 if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
 
                 for (auto user : result->users()) {
+                  errs() << *user << "\n";
                   if (isa<CallInst>(user)) {
                     CallInst *ci = cast<CallInst>(user);
-                    errs() << ci->getName() << "\t";
                     switch (funcToCatCode(ci->getName())) {
                       case cat_add:
                         errs() << *ci << "\n";
