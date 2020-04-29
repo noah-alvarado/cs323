@@ -2,6 +2,7 @@
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/Value.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
@@ -42,20 +43,28 @@ namespace {
         for (auto& I : B) {
           if (gen_sets.find(&I) == gen_sets.end()) continue;
 
-          errs() << "INSTRUCTION:\t";
+          errs() << "INSTRUCTION:   ";
           I.print(errs());
           errs() << "\n";
 
           errs() << "***************** GEN" << "\n";
           errs() << "{" << "\n";
-          // TODO: print stuff in GEN
+          for (auto& i : gen_sets[&I]) {
+            errs() << "   ";
+            i.print(errs());
+            errs() << "\n";
+          }
           errs() << "}" << "\n";
 
           errs() << "**************************************" << "\n";
 
           errs() << "***************** KILL" << "\n";
           errs() << "{" << "\n";
-          // TODO: print stuff in KILL
+          for (auto& i : kill_sets[&I]) {
+            errs() << "   ";
+            i.print(errs());
+            errs() << "\n";
+          }
           errs() << "}" << "\n";
 
           errs() << "**************************************" << "\n\n\n\n";
@@ -95,9 +104,15 @@ namespace {
             std::string funcName = callee->getName();
             switch (funcToCatCode(funcName)) {
               case cat_add: {
+                gen_sets[&I].insert(&I);
+
+                Value* result = callInst->getArgOperand(0);
+                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result))
+
                 break;
               }
               case cat_sub: {
+                gen_sets[&I].insert(&I);
                 break;
               }
               case cat_new: {
@@ -108,6 +123,11 @@ namespace {
                 break;
               }
               case cat_set: {
+                gen_sets[&I].insert(&I);
+                break;
+              }
+              case undef: {
+                // not a CAT function
                 break;
               }
             }
