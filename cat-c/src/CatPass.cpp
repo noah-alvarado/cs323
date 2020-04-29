@@ -110,7 +110,20 @@ namespace {
                 if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
 
                 for (auto user : result->users()) {
-                  errs() << *user << "\n";
+                  if (isa<CallInst>(user)) {
+                    CallInst *ci = cast<CallInst>(user);
+                    switch (funcToCatCode(ci->getName())) {
+                      case cat_add:
+                        errs() << *ci << "\n";
+                        break;
+                      case cat_sub:
+                        errs() << *ci << "\n";
+                        break;
+                      case cat_set:
+                        errs() << *ci << "\n";
+                        break;
+                    }
+                  }
                 }
 
                 // remove self from kill set
