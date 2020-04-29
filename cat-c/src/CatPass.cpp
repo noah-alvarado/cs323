@@ -6,12 +6,20 @@
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 
+#include <set>
+#include <map>
+
 using namespace std;
 using namespace llvm;
 
 namespace {
   struct CAT : public FunctionPass {
-    static char ID; 
+    static char ID;
+
+    void printH2 (Function F, std::map<Instruction *, std::set<Instruction *>> gen_sets, std::map<Instruction *, std::set<Instruction *>> kill_sets) {
+      errs() << "Function \"";
+      errs().write_escaped(F.getName()) << "\"\n";
+    }
 
     CAT() : FunctionPass(ID) {}
 
@@ -24,23 +32,25 @@ namespace {
     // This function is invoked once per function compiled
     // The LLVM IR of the input functions is ready and it can be analyzed and/or transformed
     bool runOnFunction (Function &F) override {
-      errs() << "Function \"";
-      errs().write_escaped(F.getName()) << "\"\n";
-
       DominatorTree &DT = getAnalysis<DominatorTreeWrapperPass>().getDomTree();
       std::map<std::string, int> counters;
+
+      std::map<Instruction *, std::set<Instruction *>> gen_sets;
+      std::map<Instruction *, std::set<Instruction *>> kill_sets;
 
       for (auto& B : F) {
         if (DT.dominates(&*B.begin(), &B)) continue;
 
         for (auto& I : B) {
+          // Initialize gen and kill sets
+          gen_sets[&I].clear();
+          kill_sets[&I].clear();
+
           if (isa<CallInst>(&I)) {
             CallInst *callInst = cast<CallInst>(&I);
             Function *callee = callInst->getCalledFunction();
 
             std::string funcName = callee->getName();
-            if (funcName.substr(0, 3) != "CAT") continue;
-
             switch (funcName) {
               case "CAT_add": {
                 break;
@@ -61,6 +71,8 @@ namespace {
           }
         }
       }
+
+      printH2(F, gen_sets, kill_sets);
 
       return false;
     }
