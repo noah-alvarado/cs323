@@ -178,13 +178,13 @@ namespace {
                     if (result == ci->getArgOperand(0)) {
                       switch (funcToCatCode(ci->getCalledFunction()->getName())) {
                         case cat_add:
-                          kill_sets[&I].insert(ci);
+                          kill_sets[ci].insert(&I);
                           break;
                         case cat_sub:
-                          kill_sets[&I].insert(ci);
+                          kill_sets[ci].insert(&I);
                           break;
                         case cat_set:
-                          kill_sets[&I].insert(ci);
+                          kill_sets[ci].insert(&I);
                           break;
                       }
                     }
