@@ -109,8 +109,8 @@ namespace {
                 Value* result = callInst->getArgOperand(0);
                 if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
 
-                for (auto& user : result.users()) {
-                  errs() << user << "\n";
+                for (auto user : result->users()) {
+                  errs() << *user << "\n";
                 }
 
                 // remove self from kill set
