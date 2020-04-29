@@ -175,16 +175,18 @@ namespace {
                 for (auto user : result->users()) {
                   if (isa<CallInst>(user)) {
                     CallInst *ci = cast<CallInst>(user);
-                    switch (funcToCatCode(ci->getCalledFunction()->getName())) {
-                      case cat_add:
-                        kill_sets[&I].insert(ci);
-                        break;
-                      case cat_sub:
-                        kill_sets[&I].insert(ci);
-                        break;
-                      case cat_set:
-                        kill_sets[&I].insert(ci);
-                        break;
+                    if (result == ci->getArgOperand(0)) {
+                      switch (funcToCatCode(ci->getCalledFunction()->getName())) {
+                        case cat_add:
+                          kill_sets[&I].insert(ci);
+                          break;
+                        case cat_sub:
+                          kill_sets[&I].insert(ci);
+                          break;
+                        case cat_set:
+                          kill_sets[&I].insert(ci);
+                          break;
+                      }
                     }
                   }
                 }
