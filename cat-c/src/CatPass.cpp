@@ -109,7 +109,9 @@ namespace {
                 Value* result = callInst->getArgOperand(0);
                 if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
 
-                for (auto iter = result->use_begin()) {}
+                for (auto& user : result.users()) {
+                  errs() << user << "\n";
+                }
 
                 // remove self from kill set
                 // if (kill_sets[&I].find(&I) != kill_sets[&I].end()) kill_sets[&I].erase(kill_sets[&I].find(&I));
