@@ -43,7 +43,7 @@ namespace {
           if (gen_sets.find(&I) == gen_sets.end()) continue;
 
           errs() << "INSTRUCTION:   ";
-          I.print(errs);
+          I.print(errs());
           errs() << "\n";
 
           errs() << "***************** GEN" << "\n";
