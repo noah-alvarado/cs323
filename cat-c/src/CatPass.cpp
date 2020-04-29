@@ -16,6 +16,24 @@ namespace {
   struct CAT : public FunctionPass {
     static char ID;
 
+    enum cat_code {
+      cat_add,
+      cat_sub,
+      cat_new,
+      cat_get,
+      cat_set,
+      none
+    };
+
+    cat_code funcToCatCode (std::string str) {
+      if (str == "CAT_add") return cat_add;
+      if (str == "CAT_sub") return cat_sub;
+      if (str == "CAT_new") return cat_new;
+      if (str == "CAT_get") return cat_get;
+      if (str == "CAT_set") return cat_set;
+      return none;
+    };
+
     void printH2 (Function F, std::map<Instruction *, std::set<Instruction *>> gen_sets, std::map<Instruction *, std::set<Instruction *>> kill_sets) {
       errs() << "Function \"";
       errs().write_escaped(F.getName()) << "\"\n";
@@ -51,20 +69,25 @@ namespace {
             Function *callee = callInst->getCalledFunction();
 
             std::string funcName = callee->getName();
-            switch (funcName) {
-              case "CAT_add": {
+            switch (funcToCatCode(funcName)) {
+              case cat_add: {
+                errs() << "add\n";
                 break;
               }
-              case "CAT_sub": {
+              case cat_sub: {
+                errs() << "sub\n";
                 break;
               }
-              case "CAT_new": {
+              case cat_new: {
+                errs() << "new\n";
                 break;
               }
-              case "CAT_get": {
+              case cat_get: {
+                errs() << "get\n";
                 break;
               }
-              case "CAT_set": {
+              case cat_set: {
+                errs() << "set\n";
                 break;
               }
             }
