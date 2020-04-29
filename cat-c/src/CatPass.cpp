@@ -108,7 +108,10 @@ namespace {
                 gen_sets[&I].insert(&I);
 
                 Value* result = callInst->getArgOperand(0);
-                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
+                if (isa<CallInst>(result)) {
+                  kill_sets[&I].insert(cast<CallInst>(result));
+                  kill_sets[cast<CallInst>(result)].insert(&I);
+                }
 
                 for (auto user : result->users()) {
                   if (isa<CallInst>(user)) {
