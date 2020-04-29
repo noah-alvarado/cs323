@@ -24,6 +24,8 @@ namespace {
     // This function is invoked once per function compiled
     // The LLVM IR of the input functions is ready and it can be analyzed and/or transformed
     bool runOnFunction (Function &F) override {
+      errs() << "Function " << F.getName() << "\n";
+
       DominatorTree &DT = getAnalysis<DominatorTreeWrapperPass>().getDomTree();
       std::map<std::string, int> counters;
 
@@ -36,21 +38,26 @@ namespace {
             Function *callee = callInst->getCalledFunction();
 
             std::string funcName = callee->getName();
-            if (funcName.substr(0, 3) == "CAT") {
-              if (counters.count(funcName) == 0) {
-                counters[funcName] = 0;
+            switch (funcName) {
+              case "CAT_add": {
+                break;
               }
-              counters[funcName] = counters[funcName] + 1;
+              case "CAT_sub": {
+                break;
+              }
+              case "CAT_new": {
+                break;
+              }
+              case "CAT_get": {
+                break;
+              }
+              case "CAT_set": {
+                break;
+              }
             }
           }
         }
       }
-
-      if (counters.count("CAT_add") > 0) errs() << "H1: \"" << F.getName() << "\": CAT_add: "  << counters["CAT_add"] << "\n";
-      if (counters.count("CAT_sub") > 0) errs() << "H1: \"" << F.getName() << "\": CAT_sub: "  << counters["CAT_sub"] << "\n";
-      if (counters.count("CAT_new") > 0) errs() << "H1: \"" << F.getName() << "\": CAT_new: "  << counters["CAT_new"] << "\n";
-      if (counters.count("CAT_get") > 0) errs() << "H1: \"" << F.getName() << "\": CAT_get: "  << counters["CAT_get"] << "\n";
-      if (counters.count("CAT_set") > 0) errs() << "H1: \"" << F.getName() << "\": CAT_set: "  << counters["CAT_set"] << "\n";
 
       return false;
     }
