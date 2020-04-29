@@ -24,7 +24,8 @@ namespace {
     // This function is invoked once per function compiled
     // The LLVM IR of the input functions is ready and it can be analyzed and/or transformed
     bool runOnFunction (Function &F) override {
-      errs() << "Function " << F.getName() << "\n";
+      errs() << "Function \"";
+      errs().write_escaped(F.getName()) << "\"\n";
 
       DominatorTree &DT = getAnalysis<DominatorTreeWrapperPass>().getDomTree();
       std::map<std::string, int> counters;
@@ -38,6 +39,8 @@ namespace {
             Function *callee = callInst->getCalledFunction();
 
             std::string funcName = callee->getName();
+            if (funcName.substr(0, 3) != "CAT") continue;
+
             switch (funcName) {
               case "CAT_add": {
                 break;
