@@ -48,12 +48,14 @@ namespace {
 
           errs() << "***************** GEN" << "\n";
           errs() << "{" << "\n";
+          // TODO: print stuff in GEN
           errs() << "}" << "\n";
 
           errs() << "**************************************" << "\n";
 
           errs() << "***************** KILL" << "\n";
           errs() << "{" << "\n";
+          // TODO: print stuff in KILL
           errs() << "}" << "\n";
 
           errs() << "**************************************" << "\n\n\n\n";
@@ -99,6 +101,7 @@ namespace {
                 break;
               }
               case cat_new: {
+                gen_sets[&I].insert(&I);
                 break;
               }
               case cat_get: {
