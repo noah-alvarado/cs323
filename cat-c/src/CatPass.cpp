@@ -126,7 +126,7 @@ namespace {
                 gen_sets[&I].insert(&I);
                 break;
               }
-              case undef: {
+              case none: {
                 // not a CAT function
                 break;
               }
