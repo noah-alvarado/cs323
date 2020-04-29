@@ -115,13 +115,13 @@ namespace {
                     CallInst *ci = cast<CallInst>(user);
                     switch (funcToCatCode(ci->getCalledFunction()->getName())) {
                       case cat_add:
-                        kill_sets[&I].insert(ci);
+                        kill_sets[ci].insert(&I);
                         break;
                       case cat_sub:
-                        kill_sets[&I].insert(ci);
+                        kill_sets[ci].insert(&I);
                         break;
                       case cat_set:
-                        kill_sets[&I].insert(ci);
+                        kill_sets[ci].insert(&I);
                         break;
                     }
                   }
