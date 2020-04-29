@@ -42,7 +42,7 @@ namespace {
         for (auto& I : B) {
           if (gen_sets.find(&I) == gen_sets.end()) continue;
 
-          errs() << "INSTRUCTION:   ";
+          errs() << "INSTRUCTION:\t";
           I.print(errs());
           errs() << "\n";
 
