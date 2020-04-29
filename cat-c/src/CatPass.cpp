@@ -116,44 +116,50 @@ namespace {
                 for (auto user : result->users()) {
                   if (isa<CallInst>(user)) {
                     CallInst *ci = cast<CallInst>(user);
-                    switch (funcToCatCode(ci->getCalledFunction()->getName())) {
-                      case cat_add:
-                        kill_sets[ci].insert(&I);
-                        break;
-                      case cat_sub:
-                        kill_sets[ci].insert(&I);
-                        break;
-                      case cat_set:
-                        kill_sets[ci].insert(&I);
-                        break;
+                    if (result == ci->getArgOperand(0)) {
+                      switch (funcToCatCode(ci->getCalledFunction()->getName())) {
+                        case cat_add:
+                          kill_sets[&I].insert(ci);
+                          break;
+                        case cat_sub:
+                          kill_sets[&I].insert(ci);
+                          break;
+                        case cat_set:
+                          kill_sets[&I].insert(ci);
+                          break;
+                      }
                     }
                   }
                 }
 
                 // remove self from kill set
                 if (kill_sets[&I].find(&I) != kill_sets[&I].end()) kill_sets[&I].erase(kill_sets[&I].find(&I));
-
                 break;
               }
               case cat_sub: {
                 gen_sets[&I].insert(&I);
 
                 Value* result = callInst->getArgOperand(0);
-                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
+                if (isa<CallInst>(result)) {
+                  kill_sets[&I].insert(cast<CallInst>(result));
+                  kill_sets[cast<CallInst>(result)].insert(&I);
+                }
 
                 for (auto user : result->users()) {
                   if (isa<CallInst>(user)) {
                     CallInst *ci = cast<CallInst>(user);
-                    switch (funcToCatCode(ci->getCalledFunction()->getName())) {
-                      case cat_add:
-                        kill_sets[&I].insert(ci);
-                        break;
-                      case cat_sub:
-                        kill_sets[&I].insert(ci);
-                        break;
-                      case cat_set:
-                        kill_sets[&I].insert(ci);
-                        break;
+                    if (result == ci->getArgOperand(0)) {
+                      switch (funcToCatCode(ci->getCalledFunction()->getName())) {
+                        case cat_add:
+                          kill_sets[&I].insert(ci);
+                          break;
+                        case cat_sub:
+                          kill_sets[&I].insert(ci);
+                          break;
+                        case cat_set:
+                          kill_sets[&I].insert(ci);
+                          break;
+                      }
                     }
                   }
                 }
@@ -173,7 +179,10 @@ namespace {
                 gen_sets[&I].insert(&I);
 
                 Value* result = callInst->getArgOperand(0);
-                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
+                if (isa<CallInst>(result)) {
+                  kill_sets[&I].insert(cast<CallInst>(result));
+                  kill_sets[cast<CallInst>(result)].insert(&I);
+                }
 
                 for (auto user : result->users()) {
                   if (isa<CallInst>(user)) {
@@ -181,13 +190,13 @@ namespace {
                     if (result == ci->getArgOperand(0)) {
                       switch (funcToCatCode(ci->getCalledFunction()->getName())) {
                         case cat_add:
-                          kill_sets[ci].insert(&I);
+                          kill_sets[&I].insert(ci);
                           break;
                         case cat_sub:
-                          kill_sets[ci].insert(&I);
+                          kill_sets[&I].insert(ci);
                           break;
                         case cat_set:
-                          kill_sets[ci].insert(&I);
+                          kill_sets[&I].insert(ci);
                           break;
                       }
                     }
