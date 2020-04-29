@@ -37,6 +37,28 @@ namespace {
     void printH2 (Function &F, std::map<Instruction *, std::set<Instruction *>> &gen_sets, std::map<Instruction *, std::set<Instruction *>> &kill_sets) {
       errs() << "Function \"";
       errs().write_escaped(F.getName()) << "\"\n";
+
+      for (auto& B : F) {
+        for (auto& I : B) {
+          if (gen_sets.find(&I) == gen_sets.end()) continue;
+
+          errs() << "INSTRUCTION:   ";
+          I.print(errs);
+          errs() << "\n";
+
+          errs() << "***************** GEN" << "\n";
+          errs() << "{" << "\n";
+          errs() << "}" << "\n";
+
+          errs() << "**************************************" << "\n";
+
+          errs() << "***************** KILL" << "\n";
+          errs() << "{" << "\n";
+          errs() << "}" << "\n";
+
+          errs() << "**************************************" << "\n\n\n\n";
+        }
+      }
     }
 
     CAT() : FunctionPass(ID) {}
@@ -71,23 +93,18 @@ namespace {
             std::string funcName = callee->getName();
             switch (funcToCatCode(funcName)) {
               case cat_add: {
-                errs() << "add\n";
                 break;
               }
               case cat_sub: {
-                errs() << "sub\n";
                 break;
               }
               case cat_new: {
-                errs() << "new\n";
                 break;
               }
               case cat_get: {
-                errs() << "get\n";
                 break;
               }
               case cat_set: {
-                errs() << "set\n";
                 break;
               }
             }
