@@ -110,8 +110,8 @@ namespace {
                 if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
 
                 for (auto user : result->users()) {
-                  if (isa<CallInst>(user)) {
-                    CallInst *ci = cast<CallInst>(user);
+                  if (isa<CallInst>(user->getUser())) {
+                    CallInst *ci = cast<CallInst>(user->getUser());
                     switch (funcToCatCode(ci->getName())) {
                       case cat_add:
                         errs() << *ci << "\n";
