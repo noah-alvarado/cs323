@@ -134,6 +134,29 @@ namespace {
               }
               case cat_sub: {
                 gen_sets[&I].insert(&I);
+
+                Value* result = callInst->getArgOperand(0);
+                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
+
+                for (auto user : result->users()) {
+                  if (isa<CallInst>(user)) {
+                    CallInst *ci = cast<CallInst>(user);
+                    switch (funcToCatCode(ci->getCalledFunction()->getName())) {
+                      case cat_add:
+                        kill_sets[&I].insert(ci);
+                        break;
+                      case cat_sub:
+                        kill_sets[&I].insert(ci);
+                        break;
+                      case cat_set:
+                        kill_sets[&I].insert(ci);
+                        break;
+                    }
+                  }
+                }
+
+                // remove self from kill set
+                if (kill_sets[&I].find(&I) != kill_sets[&I].end()) kill_sets[&I].erase(kill_sets[&I].find(&I));
                 break;
               }
               case cat_new: {
@@ -145,6 +168,29 @@ namespace {
               }
               case cat_set: {
                 gen_sets[&I].insert(&I);
+
+                Value* result = callInst->getArgOperand(0);
+                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
+
+                for (auto user : result->users()) {
+                  if (isa<CallInst>(user)) {
+                    CallInst *ci = cast<CallInst>(user);
+                    switch (funcToCatCode(ci->getCalledFunction()->getName())) {
+                      case cat_add:
+                        kill_sets[&I].insert(ci);
+                        break;
+                      case cat_sub:
+                        kill_sets[&I].insert(ci);
+                        break;
+                      case cat_set:
+                        kill_sets[&I].insert(ci);
+                        break;
+                    }
+                  }
+                }
+
+                // remove self from kill set
+                if (kill_sets[&I].find(&I) != kill_sets[&I].end()) kill_sets[&I].erase(kill_sets[&I].find(&I));
                 break;
               }
               case none: {
