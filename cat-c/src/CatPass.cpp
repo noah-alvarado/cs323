@@ -128,7 +128,7 @@ namespace {
                 }
 
                 // remove self from kill set
-                // if (kill_sets[&I].find(&I) != kill_sets[&I].end()) kill_sets[&I].erase(kill_sets[&I].find(&I));
+                if (kill_sets[&I].find(&I) != kill_sets[&I].end()) kill_sets[&I].erase(kill_sets[&I].find(&I));
 
                 break;
               }
