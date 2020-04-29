@@ -107,7 +107,7 @@ namespace {
                 gen_sets[&I].insert(&I);
 
                 Value* result = callInst->getArgOperand(0);
-                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result))
+                if (isa<CallInst>(result)) kill_sets[&I].insert(cast<CallInst>(result));
 
                 break;
               }
