@@ -1,4 +1,5 @@
 #include "llvm/Pass.h"
+#include "llvm/IR/CFG.h"
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
@@ -93,9 +94,12 @@ namespace {
       std::map<Instruction *, std::set<Instruction *>> in_sets;
       std::map<Instruction *, std::set<Instruction *>> out_sets;
 
+      // Build gen and kill sets
       for (auto& B : F) {
         if (DT.dominates(&*B.begin(), &B)) continue;
 
+        // build gen and kill sets
+        // initialize in and out sets
         for (auto& I : B) {
           // Initialize gen and kill sets
           gen_sets[&I].clear();
@@ -224,6 +228,23 @@ namespace {
       }
 
       // Build in and out sets from gen and kill sets
+      bool outChanged;
+      do {
+        outChanged = false;
+
+        for (auto &B : F) {
+          if (DT.dominates(&*B.begin(), &B)) continue;
+
+          std::set<Instruction *> pred_in = {};
+          for (BasicBlock *pB : predecessors(&B)) {
+            errs() << *pb << "\n";
+          }
+
+          for (auto& I : B) {
+          }
+        }
+        
+      } while (outChanged);
 
       printH3(F, in_sets, out_sets);
 
