@@ -237,9 +237,16 @@ namespace {
 
           std::set<Instruction *> pred_in = {};
           for (BasicBlock *pB : predecessors(&B)) {
-            Instruction *terminator = pB->getTerminator();
-            errs() << *terminator << "\n";
+            Instruction* terminator = pB->getTerminator();
+
+            if (out_sets.find(terminator) != out_sets.end()) {
+              for (Instruction* inst : out_sets[terminator]) {
+                in_sets[&*B.begin()].insert(inst);
+              }
+            }
           }
+
+          in_sets[&B.front()] = pred_in;
 
           for (auto& I : B) {
           }
