@@ -36,21 +36,21 @@ namespace {
       return none;
     };
 
-    void printH2 (Function &F, std::map<Instruction *, std::set<Instruction *>> &gen_sets, std::map<Instruction *, std::set<Instruction *>> &kill_sets) {
+    void printH3 (Function &F, std::map<Instruction *, std::set<Instruction *>> &in_sets, std::map<Instruction *, std::set<Instruction *>> &out_sets) {
       errs() << "Function \"";
       errs().write_escaped(F.getName()) << "\" \n";
 
       for (auto& B : F) {
         for (auto& I : B) {
-          if (gen_sets.find(&I) == gen_sets.end()) continue;
+          if (in_sets.find(&I) == in_sets.end()) continue;
 
           errs() << "INSTRUCTION: ";
           I.print(errs());
           errs() << "\n";
 
-          errs() << "***************** GEN" << "\n";
+          errs() << "***************** IN" << "\n";
           errs() << "{" << "\n";
-          for (auto i : gen_sets[&I]) {
+          for (auto i : in_sets[&I]) {
             errs() << " ";
             i->print(errs());
             errs() << "\n";
@@ -59,9 +59,9 @@ namespace {
 
           errs() << "**************************************" << "\n";
 
-          errs() << "***************** KILL" << "\n";
+          errs() << "***************** OUT" << "\n";
           errs() << "{" << "\n";
-          for (auto i : kill_sets[&I]) {
+          for (auto i : out_sets[&I]) {
             errs() << " ";
             i->print(errs());
             errs() << "\n";
@@ -90,6 +90,9 @@ namespace {
       std::map<Instruction *, std::set<Instruction *>> gen_sets;
       std::map<Instruction *, std::set<Instruction *>> kill_sets;
 
+      std::map<Instruction *, std::set<Instruction *>> in_sets;
+      std::map<Instruction *, std::set<Instruction *>> out_sets;
+
       for (auto& B : F) {
         if (DT.dominates(&*B.begin(), &B)) continue;
 
@@ -97,6 +100,10 @@ namespace {
           // Initialize gen and kill sets
           gen_sets[&I].clear();
           kill_sets[&I].clear();
+
+          // Initialize in and out sets
+          in_sets[&I].clear();
+          out_sets[&I].clear();
 
           if (isa<CallInst>(&I)) {
             CallInst *callInst = cast<CallInst>(&I);
@@ -216,7 +223,9 @@ namespace {
         }
       }
 
-      printH2(F, gen_sets, kill_sets);
+      // Build in and out sets from gen and kill sets
+
+      printH3(F, in_sets, out_sets);
 
       return false;
     }
