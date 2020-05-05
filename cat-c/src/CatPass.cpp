@@ -237,7 +237,7 @@ namespace {
 
           std::set<Instruction *> pred_in = {};
           for (BasicBlock *pB : predecessors(&B)) {
-            errs() << *pb << "\n";
+            errs() << *pB << "\n";
           }
 
           for (auto& I : B) {
