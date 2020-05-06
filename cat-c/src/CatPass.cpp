@@ -230,7 +230,9 @@ namespace {
 
       // Build in and out sets from gen and kill sets
       bool outChanged;
+      int loops = 0
       do {
+        loops += 1;
         outChanged = false;
 
         for (auto &B : F) {
@@ -264,11 +266,12 @@ namespace {
             outChanged = outChanged || differences.size() > 0;
 
             // OUT[i] = GEN[i] U (IN[i] - KILL[i])
-            out_sets[&I] = new_out_set;
+            if (differences.size() != 0) out_sets[&I] = new_out_set;
           }
         }
       } while (outChanged);
 
+      errs() << loops << "\n";
       printH3(F, in_sets, out_sets);
 
       return false;
