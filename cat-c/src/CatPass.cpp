@@ -233,6 +233,8 @@ namespace {
       int loops = 0;
       do {
         loops += 1;
+        errs() << "loop: " << loop << "\n";
+
         outChanged = false;
 
         for (auto &B : F) {
@@ -245,6 +247,7 @@ namespace {
 
             if (out_sets.find(terminator) != out_sets.end()) {
               for (Instruction* inst : out_sets[terminator]) {
+                errs() << *inst << "\n"
                 prev_out.insert(inst);
               }
             }
@@ -268,7 +271,7 @@ namespace {
             if (differences.size() > 0) outChanged = true;
 
             // OUT[i] = GEN[i] U (IN[i] - KILL[i])
-            if (differences.size() != 0) out_sets[&I] = new_out_set;
+            if (differences.size() > 0) out_sets[&I] = new_out_set;
 
             // set previous OUT set
             prev_out = out_sets[&I];
