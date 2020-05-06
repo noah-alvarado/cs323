@@ -251,11 +251,11 @@ namespace {
 
           for (auto& I : B) {
             // IN[i] - KILL[i]
-            std::set<Instruction *> set_diff = {};
+            const std::set<Instruction *> set_diff = {};
             std::set_difference(in_sets[&I].begin(), in_sets[&I].end(), kill_sets[&I].begin(), kill_sets[&I].end(), set_diff.begin());
 
             // OUT[i] = GEN[i] U (IN[i] - KILL[i])
-            std::set<Instruction *> new_out_set = {};
+            const std::set<Instruction *> new_out_set = {};
             std::set_union(gen_sets[&I].begin(), gen_sets[&I].end(), set_diff.begin(), set_diff.end(), new_out_set.begin());
 
             // check for changes to the out set
