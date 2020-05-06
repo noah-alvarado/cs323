@@ -254,7 +254,7 @@ namespace {
             std::set<Instruction *> set_diff;
             std::set_difference(in_sets[&I].begin(), in_sets[&I].end(), kill_sets[&I].begin(), kill_sets[&I].end(), std::inserter(set_diff, set_diff.end()));
 
-            // OUT[i] = GEN[i] U (IN[i] - KILL[i])
+            // GEN[i] U (IN[i] - KILL[i])
             std::set<Instruction *> new_out_set;
             std::set_union(gen_sets[&I].begin(), gen_sets[&I].end(), set_diff.begin(), set_diff.end(), std::inserter(new_out_set, new_out_set.end()));
 
@@ -262,6 +262,9 @@ namespace {
             std::set<Instruction *> differences;
             std::set_difference(out_sets[&I].begin(), out_sets[&I].end(), new_out_set.begin(), new_out_set.end(), std::inserter(differences, differences.end()));
             outChanged = outChanged || differences.size() > 0;
+
+            // OUT[i] = GEN[i] U (IN[i] - KILL[i])
+            out_sets[&I] = new_out_set;
           }
         }
       } while (outChanged);
