@@ -247,7 +247,7 @@ namespace {
 
             if (out_sets.find(terminator) != out_sets.end()) {
               for (Instruction* inst : out_sets[terminator]) {
-                errs() << *inst << "\n"
+                errs() << *inst << "\n";
                 prev_out.insert(inst);
               }
             }
