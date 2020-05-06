@@ -239,19 +239,21 @@ namespace {
           if (DT.dominates(&*B.begin(), &B)) continue;
 
           // IN[i] = U OUT[p]
-          std::set<Instruction *> pred_in = {};
+          std::set<Instruction *> prev_out = {};
           for (BasicBlock *pB : predecessors(&B)) {
             Instruction* terminator = pB->getTerminator();
 
             if (out_sets.find(terminator) != out_sets.end()) {
               for (Instruction* inst : out_sets[terminator]) {
-                in_sets[&*B.begin()].insert(inst);
+                prev_out.insert(inst);
               }
             }
           }
-          in_sets[&B.front()] = pred_in;
 
           for (auto& I : B) {
+            // IN[i] = U OUT[p]
+            in_sets[&I] = prev_out;
+
             // IN[i] - KILL[i]
             std::set<Instruction *> set_diff;
             std::set_difference(in_sets[&I].begin(), in_sets[&I].end(), kill_sets[&I].begin(), kill_sets[&I].end(), std::inserter(set_diff, set_diff.end()));
@@ -263,10 +265,13 @@ namespace {
             // check for changes to the out set
             std::set<Instruction *> differences;
             std::set_difference(out_sets[&I].begin(), out_sets[&I].end(), new_out_set.begin(), new_out_set.end(), std::inserter(differences, differences.end()));
-            outChanged = outChanged || differences.size() > 0;
+            if (differences.size() > 0) outChanged = true;
 
             // OUT[i] = GEN[i] U (IN[i] - KILL[i])
             if (differences.size() != 0) out_sets[&I] = new_out_set;
+
+            // set previous OUT set
+            prev_out = out_sets[&I];
           }
         }
       } while (outChanged);
