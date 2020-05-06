@@ -233,7 +233,7 @@ namespace {
       int loops = 0;
       do {
         loops += 1;
-        errs() << "loop: " << loop << "\n";
+        errs() << "loop: " << loops << "\n";
 
         outChanged = false;
 
