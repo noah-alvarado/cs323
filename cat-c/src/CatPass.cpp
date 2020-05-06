@@ -246,16 +246,15 @@ namespace {
           errs() << "previous out set:\n";
           for (BasicBlock *pB : predecessors(&B)) {
             Instruction* terminator = pB->getTerminator();
-            errs() << "terminator: " << *terminator << "\n";
+            errs() << "\tterminator: " << *terminator << "\n";
 
             if (out_sets.find(terminator) != out_sets.end()) {
               for (Instruction* inst : out_sets[terminator]) {
-                errs() << "\t" << *inst << "\n";
+                errs() << "\t\t" << *inst << "\n";
                 prev_out.insert(inst);
               }
             }
           }
-          errs() << "\n\n";
 
           for (auto& I : B) {
             errs() << I << "\n";
@@ -283,10 +282,12 @@ namespace {
             // check for changes to the out set
             std::set<Instruction *> differences;
             std::set_difference(out_sets[&I].begin(), out_sets[&I].end(), new_out_set.begin(), new_out_set.end(), std::inserter(differences, differences.end()));
-            if (differences.size() > 0) outChanged = true;
 
             errs() << "differences:\n";
             for (auto i_ptr : differences) errs() << *i_ptr << "\n";
+
+            if (differences.size() > 0) outChanged = true;
+            errs() << "outChanged: " << outChanged << "\n"; 
 
             // OUT[i] = GEN[i] U (IN[i] - KILL[i])
             out_sets[&I] = new_out_set;
