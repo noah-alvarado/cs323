@@ -10,6 +10,7 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 
 #include <algorithm>
+#include <iterator>
 #include <map>
 #include <set>
 
@@ -229,10 +230,10 @@ namespace {
       }
 
       // Build in and out sets from gen and kill sets
-      bool outChanged;
+      bool outChanged = false;
       int loops = 0;
       do {
-        loops += 1;
+        loops++;
         errs() << "loop: " << loops << "\n";
 
         outChanged = false;
@@ -242,45 +243,61 @@ namespace {
 
           // IN[i] = U OUT[p]
           std::set<Instruction *> prev_out = {};
+          errs() << "previous out set:\n";
           for (BasicBlock *pB : predecessors(&B)) {
             Instruction* terminator = pB->getTerminator();
+            errs() << "terminator: " << *terminator << "\n";
 
             if (out_sets.find(terminator) != out_sets.end()) {
               for (Instruction* inst : out_sets[terminator]) {
-                errs() << *inst << "\n";
+                errs() << "\t" << *inst << "\n";
                 prev_out.insert(inst);
               }
             }
           }
+          errs() << "\n\n";
 
           for (auto& I : B) {
+            errs() << I << "\n";
+
             // IN[i] = U OUT[p]
             in_sets[&I] = prev_out;
+
+            errs() << "in_set:\n";
+            for (auto i_ptr : in_sets[&I]) errs() << *i_ptr << "\n";
 
             // IN[i] - KILL[i]
             std::set<Instruction *> set_diff;
             std::set_difference(in_sets[&I].begin(), in_sets[&I].end(), kill_sets[&I].begin(), kill_sets[&I].end(), std::inserter(set_diff, set_diff.end()));
 
+            errs() << "set_diff:\n";
+            for (auto i_ptr : set_diff) errs() << *i_ptr << "\n";
+
             // GEN[i] U (IN[i] - KILL[i])
             std::set<Instruction *> new_out_set;
             std::set_union(gen_sets[&I].begin(), gen_sets[&I].end(), set_diff.begin(), set_diff.end(), std::inserter(new_out_set, new_out_set.end()));
+
+            errs() << "new_out_set:\n";
+            for (auto i_ptr : new_out_set) errs() << *i_ptr << "\n";
 
             // check for changes to the out set
             std::set<Instruction *> differences;
             std::set_difference(out_sets[&I].begin(), out_sets[&I].end(), new_out_set.begin(), new_out_set.end(), std::inserter(differences, differences.end()));
             if (differences.size() > 0) outChanged = true;
 
+            errs() << "differences:\n";
+            for (auto i_ptr : differences) errs() << *i_ptr << "\n";
+
             // OUT[i] = GEN[i] U (IN[i] - KILL[i])
-            if (differences.size() > 0) out_sets[&I] = new_out_set;
+            out_sets[&I] = new_out_set;
 
             // set previous OUT set
-            prev_out = out_sets[&I];
+            prev_out = new_out_set;
           }
         }
       } while (outChanged);
 
-      errs() << loops << "\n";
-      printH3(F, in_sets, out_sets);
+      //printH3(F, in_sets, out_sets);
 
       return false;
     }
