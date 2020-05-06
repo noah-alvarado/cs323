@@ -230,7 +230,7 @@ namespace {
 
       // Build in and out sets from gen and kill sets
       bool outChanged;
-      int loops = 0
+      int loops = 0;
       do {
         loops += 1;
         outChanged = false;
