@@ -279,6 +279,9 @@ namespace {
             errs() << "new_out_set:\n";
             for (auto i_ptr : new_out_set) errs() << *i_ptr << "\n";
 
+            errs() << "old_out_set:\n";
+            for (auto i_ptr : out_sets[&I]) errs() << *i_ptr << "\n";
+
             // check for changes to the out set
             std::set<Instruction *> differences;
             std::set_difference(out_sets[&I].begin(), out_sets[&I].end(), new_out_set.begin(), new_out_set.end(), std::inserter(differences, differences.end()));
